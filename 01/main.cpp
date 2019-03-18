@@ -5,7 +5,8 @@
 bool isPrime(int x)
 {
     if(x == 2) return true;
-    for (int i = 2; i <= std::sqrt(x); i++) {
+    if(x % 2 == 0)return false;
+    for (int i = 3; i <= std::sqrt(x); i += 2) {
         if (x % i == 0) return false;
     }
     if(x == 1) return false;
@@ -54,7 +55,7 @@ int main(int argc, char* argv[])
     for (int i = 1; i < argc; i += 2)
     {
         if(argv[i] > argv[i + 1]) return -1;
-        if(isdigit(std::atoi(argv[i])) || isdigit(std::atoi(argv[i + 1]))) return -1;
+        if(std::atoi(argv[i]) == 0 || std::atoi(argv[i + 1]) == 0) return -1;
     }
 
     for (int i = 1; i < argc; i++)
