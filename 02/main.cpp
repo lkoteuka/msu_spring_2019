@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 
-int64_t calc(std::string str)
+int64_t calc(const std::string &str)
 {
 
     int ind_mul_div = 0;
@@ -39,27 +39,13 @@ int64_t calc(std::string str)
         return calc(str.substr(0, ind_mul_div)) / calc(str.substr(ind_mul_div + 1, str.length()));
 }
 
-
-int main(int argc, char* argv[])
+bool check(const std::string &str)
 {
-    if(argc != 2)
-    {
-        std::cout << "error" << '\n';
-        return 1;
-    }
-
-    //REGEX for "--" -> "+", "+-" -> "-"
-    std::string str(argv[1]);
-    str.erase(std::remove(str.begin(),str.end(),' '),str.end());
-    str = std::regex_replace(str, std::regex("--"), std::string("+"));
-    str = std::regex_replace(str, std::regex("\\+-"), std::string("-"));
-
     //Check division by zero
-    if (str.find(std::string("/0")) != std::string::npos) {
-        std::cout << "error" << '\n';
-        return 1;
+    if (str.find("/0") != std::string::npos) {
+        return true;
     }
-    
+
     //Now check the (number of digits) == (the number of operations + 1), but str[0] can be == '-'
     int c_num = 0, c_op = 0;
     bool flag = false;
@@ -86,16 +72,37 @@ int main(int argc, char* argv[])
             }
             else
             {
-                std::cout << "error" << '\n';
-                return 1;
+                return true;
             }
     }
     if(c_num != c_op + 1)
     {
-        std::cout << "error" << '\n';
-        return 1;
+        return true;
     }
+    return false;
+}
 
-    std::cout << calc(str) << std::endl;
-    return 0;
+bool transform(std::string &str)
+{
+    //REGEX for "--" -> "+", "+-" -> "-"
+    str.erase(std::remove(str.begin(),str.end(),' '),str.end());
+    str = std::regex_replace(str, std::regex("--"), "+");
+    str = std::regex_replace(str, std::regex("\\+-"), "-");
+
+    return check(str);
+}
+
+int main(int argc, char* argv[])
+{
+    if(argc == 2)
+    {
+        std::string str(argv[1]);
+        if( !transform(str))
+        {
+            std::cout << calc(str) << std::endl;
+            return 0;
+        }
+    }
+    std::cout << "error" << std::endl;
+    return 1;
 }
