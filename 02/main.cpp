@@ -3,6 +3,11 @@
 #include <string>
 #include <stdint.h>
 
+namespace
+{
+    const std::regex add("--");
+    const std::regex sub("\\+-");
+}
 
 int64_t calc(const std::string &str)
 {
@@ -86,8 +91,8 @@ bool transform(std::string &str)
 {
     //REGEX for "--" -> "+", "+-" -> "-"
     str.erase(std::remove(str.begin(),str.end(),' '),str.end());
-    str = std::regex_replace(str, std::regex("--"), "+");
-    str = std::regex_replace(str, std::regex("\\+-"), "-");
+    str = std::regex_replace(str, add, "+");
+    str = std::regex_replace(str, sub, "-");
 
     return check(str);
 }
