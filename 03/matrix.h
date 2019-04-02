@@ -3,21 +3,16 @@
 
 class Row
 {
-    int len;
+    public: int len;
     int* mas;
 
     public:
     Row(){}
 
-    void setmas(int lens)
+    Row(int lens)
     {
         (*this).len = lens;
-        mas = new int[len];
-    }
-
-    Row& operator=(Row& obj)
-    {
-        return obj;
+        mas = new int[lens];
     }
 
     Row& operator*=(int mn)
@@ -46,7 +41,6 @@ class Row
     ~Row()
     {
         delete[] mas;
-        mas = nullptr;
     }
 };
 
@@ -61,10 +55,10 @@ class Matrix
     {
         (*this).col = col;
         (*this).row = row;
-        rows = new Row[col];
+        rows = (Row*)(operator new(sizeof(Row) * row));
         for(int i = 0; i < row; i++)
         {
-            rows[i].setmas(col);
+            Row *buf = new (rows + i) Row(col);
         }
     }
 
@@ -72,10 +66,10 @@ class Matrix
     {
         row = obj.getRows();
         col = obj.getColumns();
-        rows = new Row[col];
+        rows = (Row*)(operator new(sizeof(Row) * row));
         for(int i = 0; i < row; i++)
         {
-            rows[i].setmas(col);
+            Row* buf = new (rows + i) Row(col);
         }
 
         for(int i = 0; i < col - 1; i ++)
@@ -108,7 +102,6 @@ class Matrix
     {
         if(i > row - 1)
             throw std::out_of_range("");
-
         return rows[i];
     }
 
@@ -148,11 +141,10 @@ class Matrix
 
     ~Matrix()
     {
-        for(int i = 0; i < row; i++)
+        for(int j = 0; j < row; j++)
         {
-            rows[i].~Row();
+            rows[j].~Row();
         }
-        delete[] rows;
-        rows = nullptr;
+        operator delete(rows);
     }
 };
