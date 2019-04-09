@@ -41,7 +41,7 @@ private:
     template <typename T, typename... Args>
     Error process(T &&value, Args&&... args)
     {
-        if(write(value) == Error::NoError && process(std::forward<Args>(args)...) == Error::NoError)
+        if(write(std::forward<T>(value)) == Error::NoError && process(std::forward<Args>(args)...) == Error::NoError)
         {
             return Error::NoError;
         }
@@ -127,7 +127,7 @@ private:
     template <typename T, typename... Args>
     Error process(T &&value, Args&&... args)
     {
-        if(read(value) == Error::NoError && process(std::forward<Args>(args)...) == Error::NoError)
+        if(read(std::forward<T>(value)) == Error::NoError && process(std::forward<Args>(args)...) == Error::NoError)
         {
             return Error::NoError;
         }
