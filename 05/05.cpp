@@ -3,10 +3,11 @@
 #include <atomic>
 
 std::atomic<int> i;
+const int MAGIC_NUMBER = 1000000;
 
 void t1()
 {
-    while(i < 1000000)
+    while(i < MAGIC_NUMBER)
     {
         if(i % 2 == 1)
         {
@@ -18,7 +19,7 @@ void t1()
 
 void t2()
 {
-    while(i < 1000000)
+    while(i < MAGIC_NUMBER)
     {
         if(i % 2 == 0)
         {
