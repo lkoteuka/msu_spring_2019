@@ -4,10 +4,10 @@
 #include <string>
 #include <string.h>
 
-const char input[] = "input.bin";
+std::string input = "input.bin";
 
 //получаем количество чисел в файле
-int file_size(std::string filename)
+uint64_t file_size(std::string &filename)
 {
     FILE *input_file = fopen(filename.c_str(), "rb");
     fseek(input_file, 0, SEEK_END);
@@ -22,6 +22,8 @@ void my_mergefile(std::string file1, std::string file2, std::string out_file) {
     FILE* left = fopen(file1.c_str(), "rb");
     FILE* right = fopen(file2.c_str(), "rb");
 
+    //std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "wb"), &fclose);
+    
     uint64_t left_size = file_size(file1);
     uint64_t right_size = file_size(file2);
     uint64_t tmp1, tmp2;
@@ -66,7 +68,7 @@ std::string my_mergesort(uint step, uint64_t left, uint64_t right) {
     } else {
         std::string out_file = std::string(std::to_string(step) + "_" + std::to_string(left) + '_' + std::to_string(right));
         FILE* out = fopen(out_file.c_str(), "wb");
-        FILE* in = fopen(input, "rb");
+        FILE* in = fopen(input.c_str(), "rb");
         uint64_t tmp;
         fseek(in, sizeof(uint64_t) * left, SEEK_SET);
         fread(&tmp, sizeof(uint64_t), 1, in);
@@ -80,7 +82,7 @@ std::string my_mergesort(uint step, uint64_t left, uint64_t right) {
 int main(int argc, char **argv)
 {
     uint64_t size = file_size(input);
-    std::string file1 = std::string("0_" + std::to_string(0) + '_' + std::to_string((size - 1) / 2));
+    std::string file1 = std::string("0_0_" + std::to_string((size - 1) / 2));
     std::string file2 = std::string("0_" + std::to_string((size - 1) / 2 + 1) + '_' + std::to_string(size - 1));
 
     //потоки сортируют разные части файла
