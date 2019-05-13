@@ -7,53 +7,53 @@
 std::string input = "input.bin";
 
 //получаем количество чисел в файле
-uint64_t file_size(std::string &filename)
+int file_size(std::string &filename)
 {
-    FILE *input_file = fopen(filename.c_str(), "rb");
-    fseek(input_file, 0, SEEK_END);
-    uint64_t size = ftell(input_file) / sizeof(uint64_t);
-    fclose(input_file);
+    std::unique_ptr<FILE, int(*)(FILE*)> input_file(fopen(filename.c_str(), "rb"), &fclose);
+    fseek(input_file.get(), 0, SEEK_END);
+    uint64_t size = ftell(input_file.get()) / sizeof(uint64_t);
     return size;
 }
 
+void close_file(std::FILE* fp) { std::fclose(fp); }
+
 //merge двух файлов
 void my_mergefile(std::string file1, std::string file2, std::string out_file) {
-    FILE* out = fopen(out_file.c_str(), "wb");
-    FILE* left = fopen(file1.c_str(), "rb");
-    FILE* right = fopen(file2.c_str(), "rb");
+    //FILE* out = fopen(out_file.c_str(), "wb");
+    //FILE* left = fopen(file1.c_str(), "rb");
+    //FILE* right = fopen(file2.c_str(), "rb");
 
-    //std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, int(*)(FILE*)> left(fopen(file1.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, int(*)(FILE*)> right(fopen(file2.c_str(), "wb"), &fclose);
     
     uint64_t left_size = file_size(file1);
     uint64_t right_size = file_size(file2);
     uint64_t tmp1, tmp2;
 
-    fread(&tmp1, sizeof(uint64_t), 1, left);
-    fread(&tmp2, sizeof(uint64_t), 1, right);
+    fread(&tmp1, sizeof(uint64_t), 1, left.get());
+    fread(&tmp2, sizeof(uint64_t), 1, right.get());
 
     //сортируем числа первого и второго файлов и сохраняем в out
     while(left_size != 0 || right_size != 0) {
         if (right_size == 0){
             left_size--;
-            fwrite(&tmp1, sizeof(uint64_t), 1, out);
-            if(left_size) fread(&tmp1, sizeof(uint64_t), 1, left);
+            fwrite(&tmp1, sizeof(uint64_t), 1, out.get());
+            if(left_size) fread(&tmp1, sizeof(uint64_t), 1, left.get());
         } else if (left_size == 0){
             right_size--;
-            fwrite(&tmp2, sizeof(uint64_t), 1, out);
-            if(right_size) fread(&tmp2, sizeof(uint64_t), 1, right);
+            fwrite(&tmp2, sizeof(uint64_t), 1, out.get());
+            if(right_size) fread(&tmp2, sizeof(uint64_t), 1, right.get());
         } else if(tmp1 <= tmp2) {
             left_size--;
-            fwrite(&tmp1, sizeof(uint64_t), 1, out);
-            if(left_size) fread(&tmp1, sizeof(uint64_t), 1, left);
+            fwrite(&tmp1, sizeof(uint64_t), 1, out.get());
+            if(left_size) fread(&tmp1, sizeof(uint64_t), 1, left.get());
         } else if(tmp1 > tmp2){
             right_size--;
-            fwrite(&tmp2, sizeof(uint64_t), 1, out);
-            if(right_size) fread(&tmp2, sizeof(uint64_t), 1, right);
+            fwrite(&tmp2, sizeof(uint64_t), 1, out.get());
+            if(right_size) fread(&tmp2, sizeof(uint64_t), 1, right.get());
         }
     }
-    fclose(out);
-    fclose(left);
-    fclose(right);
 }
 
 std::string my_mergesort(uint step, uint64_t left, uint64_t right) {
@@ -67,14 +67,13 @@ std::string my_mergesort(uint step, uint64_t left, uint64_t right) {
         return out_file;
     } else {
         std::string out_file = std::string(std::to_string(step) + "_" + std::to_string(left) + '_' + std::to_string(right));
-        FILE* out = fopen(out_file.c_str(), "wb");
-        FILE* in = fopen(input.c_str(), "rb");
+        std::unique_ptr<FILE, int(*)(FILE*)> in(fopen(input.c_str(), "rb"), &fclose);
+        std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "rb"), &fclose);
+
         uint64_t tmp;
-        fseek(in, sizeof(uint64_t) * left, SEEK_SET);
-        fread(&tmp, sizeof(uint64_t), 1, in);
-        fwrite(&tmp, sizeof(uint64_t), 1, out);
-        fclose(out);
-        fclose(in);
+        fseek(in.get(), sizeof(uint64_t) * left, SEEK_SET);
+        fread(&tmp, sizeof(uint64_t), 1, in.get());
+        fwrite(&tmp, sizeof(uint64_t), 1, out.get());
         return out_file;
     }
 }
