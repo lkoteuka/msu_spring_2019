@@ -9,13 +9,11 @@ std::string input = "input.bin";
 //получаем количество чисел в файле
 int file_size(std::string &filename)
 {
-    std::unique_ptr<FILE, int(*)(FILE*)> input_file(fopen(filename.c_str(), "rb"), &fclose);
+    std::unique_ptr<FILE, decltype(&fclose)> input_file(fopen(filename.c_str(), "rb"), &fclose);
     fseek(input_file.get(), 0, SEEK_END);
     uint64_t size = ftell(input_file.get()) / sizeof(uint64_t);
     return size;
 }
-
-void close_file(std::FILE* fp) { std::fclose(fp); }
 
 //merge двух файлов
 void my_mergefile(std::string file1, std::string file2, std::string out_file) {
@@ -23,9 +21,9 @@ void my_mergefile(std::string file1, std::string file2, std::string out_file) {
     //FILE* left = fopen(file1.c_str(), "rb");
     //FILE* right = fopen(file2.c_str(), "rb");
 
-    std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "wb"), &fclose);
-    std::unique_ptr<FILE, int(*)(FILE*)> left(fopen(file1.c_str(), "wb"), &fclose);
-    std::unique_ptr<FILE, int(*)(FILE*)> right(fopen(file2.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, decltype(&fclose)> out(fopen(out_file.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, decltype(&fclose)> left(fopen(file1.c_str(), "wb"), &fclose);
+    std::unique_ptr<FILE, decltype(&fclose)> right(fopen(file2.c_str(), "wb"), &fclose);
     
     uint64_t left_size = file_size(file1);
     uint64_t right_size = file_size(file2);
@@ -67,8 +65,8 @@ std::string my_mergesort(uint step, uint64_t left, uint64_t right) {
         return out_file;
     } else {
         std::string out_file = std::string(std::to_string(step) + "_" + std::to_string(left) + '_' + std::to_string(right));
-        std::unique_ptr<FILE, int(*)(FILE*)> in(fopen(input.c_str(), "rb"), &fclose);
-        std::unique_ptr<FILE, int(*)(FILE*)> out(fopen(out_file.c_str(), "rb"), &fclose);
+        std::unique_ptr<FILE, decltype(&fclose)> in(fopen(input.c_str(), "rb"), &fclose);
+        std::unique_ptr<FILE, decltype(&fclose)> out(fopen(out_file.c_str(), "rb"), &fclose);
 
         uint64_t tmp;
         fseek(in.get(), sizeof(uint64_t) * left, SEEK_SET);
