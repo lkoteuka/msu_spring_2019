@@ -9,7 +9,7 @@ using file_ptr = std::unique_ptr<FILE, int(*)(FILE*)>;
 std::string input = "input.bin";
 
 //получаем количество чисел в файле
-int file_size(const std::string &filename)
+uint64_t file_size(const std::string &filename)
 {
     file_ptr input_file(fopen(filename.c_str(), "rb"), &fclose);
     fseek(input_file.get(), 0, SEEK_END);
@@ -19,9 +19,6 @@ int file_size(const std::string &filename)
 
 //merge двух файлов
 void my_mergefile(const std::string &file1, const std::string &file2, const std::string &out_file) {
-    //FILE* out = fopen(out_file.c_str(), "wb");
-    //FILE* left = fopen(file1.c_str(), "rb");
-    //FILE* right = fopen(file2.c_str(), "rb");
 
     file_ptr out(fopen(out_file.c_str(), "wb"), &fclose);
     file_ptr left(fopen(file1.c_str(), "wb"), &fclose);
