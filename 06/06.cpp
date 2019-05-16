@@ -6,7 +6,7 @@
 
 using file_ptr = std::unique_ptr<FILE, int(*)(FILE*)>;
 
-std::string input = "input.bin";
+const std::string input = "input.bin";
 
 //получаем количество чисел в файле
 uint64_t file_size(const std::string &filename)
@@ -21,8 +21,8 @@ uint64_t file_size(const std::string &filename)
 void my_mergefile(const std::string &file1, const std::string &file2, const std::string &out_file) {
 
     file_ptr out(fopen(out_file.c_str(), "wb"), &fclose);
-    file_ptr left(fopen(file1.c_str(), "wb"), &fclose);
-    file_ptr right(fopen(file2.c_str(), "wb"), &fclose);
+    file_ptr left(fopen(file1.c_str(), "rb"), &fclose);
+    file_ptr right(fopen(file2.c_str(), "rb"), &fclose);
     
     uint64_t left_size = file_size(file1);
     uint64_t right_size = file_size(file2);
